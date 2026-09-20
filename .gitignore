@@ -13,6 +13,13 @@
 # testing
 /coverage
 
+# playwright — the baseline in tests/__frames__ IS committed on purpose;
+# only run artefacts are ignored
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
 # next.js
 /.next/
 /out/
@@ -30,8 +37,10 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files — rahasia tidak pernah masuk repo
 .env*
+# …kecuali contohnya, yang justru dokumentasi: README menunjuk ke berkas ini.
+!.env.example
 
 # vercel
 .vercel

@@ -1,69 +1,68 @@
-import Image from "next/image";
+import { redirect } from "next/navigation";
 
-export default function Home() {
+import { SekelasApp } from "@/components/sekelas-app";
+import { loadSnapshot, resetSandbox } from "@/lib/load-snapshot";
+import { savedPersona } from "@/lib/persona-server";
+
+// Snapshot terikat pada sandbox pengunjung, jadi halaman ini tidak boleh pernah
+// di-cache — satu shell yang ter-cache akan menyajikan data orang lain.
+export const dynamic = "force-dynamic";
+
+/**
+ * The design is a 390×844 phone frame on a #EDEBF3 canvas, so the app renders
+ * at that size and is centred on larger screens.
+ *
+ * Every "Prototype" prop the design file exposes is accepted as a query param,
+ * which is how the frames in `Sekelas Screens.dc.html` are addressed — e.g.
+ * `/?screen=submissions&role=guru&guruId=t1&subTaskId=a1`.
+ */
+export default async function Page({ searchParams }) {
+  const q = await searchParams;
+  const pick = (key) => (Array.isArray(q?.[key]) ? q[key][0] : q?.[key]);
+
+  // Persona yang tersimpan dipakai kalau URL-nya tidak menyebut peran, supaya
+  // muat ulang tidak mengembalikan guru atau TU ke layar siswa. Query param
+  // tetap menang: tautan langsung di README harus selalu merender apa yang
+  // ditulisnya, siapa pun yang membukanya.
+  const persona = await savedPersona({ frozen: pick("frozen") === "1" });
+
+  const props = {
+    screen: pick("screen"),
+    role: pick("role") || persona?.role,
+    guruId: pick("guruId") || persona?.teacherId,
+    adminClass: pick("adminClass"),
+    taskKind: pick("taskKind"),
+    statusFilter: pick("statusFilter"),
+    subjectFilter: pick("subjectFilter"),
+    dayIndex: pick("dayIndex"),
+    subjectId: pick("subjectId"),
+    taskId: pick("taskId"),
+    subTaskId: pick("subTaskId"),
+    sheet: pick("sheet"),
+    studentName: pick("studentName"),
+    streak: pick("streak") ? Number(pick("streak")) : undefined,
+  };
+
+  // `reset=1` mengembalikan sandbox ke kondisi awal, lalu **dibuang dari URL**:
+  // kalau parameternya tetap menempel, tiap muat ulang akan mereset lagi dan
+  // pengunjung tidak akan pernah bisa mencoba apa pun. Mode frozen tidak punya
+  // apa pun untuk direset, jadi URL frame tidak ikut terpengaruh.
+  if (pick("reset") === "1" && pick("frozen") !== "1") {
+    await resetSandbox();
+    redirect("/");
+  }
+
+  // `frozen=1` merender dari seed lokal tanpa menyentuh database — itu yang
+  // dipakai harness fidelitas.
+  const { snapshot, workspaceId, frozen } = await loadSnapshot({ frozen: pick("frozen") === "1" });
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.js
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <main className="flex min-h-dvh items-center justify-center bg-canvas p-0 sm:p-[16px]">
+      {/* `key` memaksa remount setelah reset: state klien diinisialisasi sekali,
+          jadi snapshot baru akan diabaikan tanpa ini. */}
+      {/* `frozen` mematikan penulisan ke server: perubahan cukup hidup di
+          memori, persis seperti sebelum ada database. */}
+      <SekelasApp key={workspaceId || "local"} {...props} frozen={frozen} snapshot={snapshot} />
+    </main>
   );
 }

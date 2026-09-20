@@ -1,26 +1,170 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/*
+ * Design tokens taken verbatim from `design/Sekelas App v2.dc.html`.
+ * Every value here exists in the design file — nothing is invented, and the
+ * shadcn variables below are remapped onto these so shadcn primitives inherit
+ * the Sekelas look instead of their own defaults.
+ */
+@theme {
+  --font-sans: var(--font-jakarta), system-ui, sans-serif;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  /* Surfaces */
+  --color-canvas: #edebf3;
+  --color-app: #f7f6fb;
+  --color-surface: #ffffff;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  /* Ink */
+  --color-ink: #14121f;
+  --color-ink-2: #4a4760;
+  --color-ink-3: #5c5872;
+  --color-ink-4: #6b6880;
+  --color-ink-5: #8b8799;
+  --color-ink-6: #9b98a8;
+  --color-ink-7: #b4b0c2;
+
+  /* Brand / accents — pairs of solid, tint and on-tint ink */
+  --color-brand: #6d4aff;
+  --color-brand-strong: #5334e0;
+  --color-brand-tint: #f1eeff;
+  --color-brand-tint-2: #efebff;
+
+  --color-green: #10b981;
+  --color-green-solid: #0e9f6e;
+  --color-green-ink: #0b7a55;
+  --color-green-tint: #e9fbf3;
+
+  --color-yellow: #facc15;
+  --color-yellow-ink: #8a6100;
+  --color-yellow-tint: #fff7db;
+  --color-yellow-tint-2: #fff3d1;
+
+  --color-red: #ff6b5a;
+  --color-red-ink: #c2302f;
+  --color-red-ink-2: #c2402f;
+  --color-red-tint: #ffede9;
+  --color-red-tint-2: #ffe9e7;
+
+  --color-sky: #38bdf8;
+  --color-sky-ink: #0a6d91;
+  --color-sky-tint: #e6f6fe;
+
+  --color-lime: #c8f169;
+  --color-lime-ink: #26320a;
+
+  --color-track: #e4e1ef;
+  --color-dot: #c8cbd6;
+
+  /* Hairlines — the design uses rgba(20,18,31,·) at six opacities */
+  --color-line-05: rgb(20 18 31 / 0.05);
+  --color-line-06: rgb(20 18 31 / 0.06);
+  --color-line-07: rgb(20 18 31 / 0.07);
+  --color-line-08: rgb(20 18 31 / 0.08);
+  --color-line-09: rgb(20 18 31 / 0.09);
+  --color-line-10: rgb(20 18 31 / 0.1);
+  --color-fill-045: rgb(20 18 31 / 0.045);
+  --color-fill-055: rgb(20 18 31 / 0.055);
+
+  --shadow-phone: 0 24px 60px -20px rgb(24 18 54 / 0.35), 0 0 0 1px rgb(24 18 54 / 0.08);
+  --shadow-brand: 0 10px 24px -12px rgb(109 74 255 / 0.9);
+  --shadow-sheet: 0 -18px 50px -20px rgb(24 18 54 / 0.35);
+  --shadow-toast: 0 14px 34px -14px rgb(20 18 31 / 0.6);
+
+  --animate-sk-pop: skPop 0.32s cubic-bezier(0.2, 0.9, 0.3, 1.4);
+  --animate-sk-rise: skRise 0.22s ease-out;
+  --animate-sk-toast: skToast 2.3s ease forwards;
+
+  @keyframes skPop {
+    0% {
+      transform: scale(0.6);
+      opacity: 0;
+    }
+    60% {
+      transform: scale(1.18);
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  @keyframes skRise {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes skToast {
+    0% {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    12% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    88% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(8px);
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* shadcn primitives inherit the design palette, not shadcn defaults. */
+:root {
+  --radius: 1rem;
+  --background: #f7f6fb;
+  --foreground: #14121f;
+  --card: #ffffff;
+  --card-foreground: #14121f;
+  --popover: #ffffff;
+  --popover-foreground: #14121f;
+  --primary: #6d4aff;
+  --primary-foreground: #ffffff;
+  --secondary: #f1eeff;
+  --secondary-foreground: #5334e0;
+  --muted: rgb(20 18 31 / 0.045);
+  --muted-foreground: #6b6880;
+  --accent: #f1eeff;
+  --accent-foreground: #5334e0;
+  --destructive: #ff6b5a;
+  --border: rgb(20 18 31 / 0.08);
+  --input: rgb(20 18 31 / 0.09);
+  --ring: #6d4aff;
+}
+
+@layer base {
+  html {
+    @apply font-sans;
+  }
+  body {
+    margin: 0;
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+  }
+  input,
+  textarea,
+  select,
+  button {
+    font-family: inherit;
+  }
+}
+
+/* The design hides scrollbars inside every scrolling screen. */
+.sk-scroll {
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.sk-scroll::-webkit-scrollbar {
+  display: none;
 }
