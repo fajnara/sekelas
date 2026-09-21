@@ -179,4 +179,23 @@
   .sk-status-bar {
     display: none;
   }
+
+  /* Di ponsel, mockup berhenti jadi mockup: bingkainya mengisi layar penuh
+     seperti aplikasi native — tanpa sudut membulat, tanpa bayangan, dan tanpa
+     kanvas mengelilinginya. `100dvh` ikut menyusut saat toolbar Safari muncul,
+     jadi tepi bawah bingkai selalu tepi bawah yang benar-benar terlihat dan
+     navigasi tidak pernah tertimpa olehnya. */
+  .sk-phone-frame {
+    width: 100%;
+    height: 100dvh;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  /* Ruang untuk home indicator iPhone. `env()` bernilai 0 di peramban yang
+     tidak punya area aman, jadi menambahkannya tidak mengubah apa pun di
+     tempat lain. */
+  .sk-bottom-nav {
+    bottom: calc(14px + env(safe-area-inset-bottom));
+  }
 }

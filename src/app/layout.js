@@ -16,7 +16,9 @@ export const metadata = {
 export const viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#edebf3",
+  // Warna latar aplikasi, bukan kanvas: di ponsel bingkainya mengisi layar,
+  // jadi inilah warna yang bersambung dengan chrome peramban.
+  themeColor: "#f7f6fb",
 };
 
 export default function RootLayout({ children }) {

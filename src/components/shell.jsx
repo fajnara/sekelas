@@ -11,7 +11,7 @@ export function PhoneFrame({ children, frameRef }) {
   return (
     <div
       ref={frameRef}
-      className="relative h-[844px] w-[390px] overflow-hidden rounded-[44px] bg-app text-ink shadow-phone"
+      className="sk-phone-frame relative h-[844px] w-[390px] overflow-hidden rounded-[44px] bg-app text-ink shadow-phone"
     >
       {children}
     </div>
@@ -41,7 +41,7 @@ export function BottomNav({ v }) {
   if (!v.showNav) return null;
   return (
     <div
-      className="absolute inset-x-[14px] bottom-[14px] z-50 grid grid-flow-col auto-cols-fr gap-[2px] rounded-[26px] border p-[9px_8px] shadow-[0_14px_34px_-14px_rgba(24,18,54,.35)] backdrop-blur-[12px]"
+      className="sk-bottom-nav absolute inset-x-[14px] bottom-[14px] z-50 grid grid-flow-col auto-cols-fr gap-[2px] rounded-[26px] border p-[9px_8px] shadow-[0_14px_34px_-14px_rgba(24,18,54,.35)] backdrop-blur-[12px]"
       style={{ background: v.navBg, borderColor: v.navBorder }}
     >
       {v.navItems.map((n) => (
