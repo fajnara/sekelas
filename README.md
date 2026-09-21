@@ -92,7 +92,8 @@ src/
     ui/                Komponen shadcn mentah
     screens/
       siswa.jsx        Login, Home, Tugas, Detail tugas, Mapel, Detail mapel,
-                       Kalender, Profil, Nilai, Notifikasi
+                       Kalender, Profil, Nilai, Notifikasi, Kelas & wali kelas,
+                       Data diri, Bantuan & masukan
       admin.jsx        Dashboard TU, Kelola mapel, Form mapel, Jadwal,
                        Materi, Kelola tugas
       guru.jsx         Form tugas, Dashboard guru, Jadwal mengajar,
@@ -115,6 +116,15 @@ tiap frame di katalog desain punya URL-nya sendiri:
 | v9           | `/?screen=adminSchedule&role=tu&sheet=slot&frozen=1`                  |
 | v10          | `/?screen=tuClassDetail&role=tu&adminClass=10ipa1&frozen=1`           |
 | v12          | `/?screen=tuProfile&role=tu&frozen=1`                                 |
+
+Tiga layar berikut tidak punya frame di katalog desain — desain tidak pernah
+menggambarnya (lihat "Divergensi yang diambil sadar"):
+
+| Layar             | URL                            |
+| ----------------- | ------------------------------ |
+| Kelas & wali kelas | `/?screen=myClass&frozen=1`   |
+| Data diri          | `/?screen=myData&frozen=1`    |
+| Bantuan & masukan  | `/?screen=help&frozen=1`      |
 
 Param yang didukung: `screen`, `role`, `guruId`, `adminClass`, `taskKind`,
 `statusFilter`, `subjectFilter`, `dayIndex`, `subjectId`, `taskId`,
@@ -464,7 +474,7 @@ Dua keputusan skema yang menopang sisanya:
 
 ### Divergensi yang diambil sadar
 
-Tiga perilaku berbeda dari desain, semuanya karena desainnya sendiri tidak
+Lima perilaku berbeda dari desain, semuanya karena desainnya sendiri tidak
 konsisten:
 
 1. **Layar Pengumpulan, baris Alya.** Desain menebak siapa yang sudah
@@ -479,9 +489,24 @@ konsisten:
    alasannya ("Masih dipakai di 18 slot jadwal · 3 tugas.") daripada
    meninggalkan jadwal dan tugas tanpa induk.
 3. **Tanggal di layar Nilai** selalu absolut — lihat bagian jam di bawah.
+4. **Status bar hilang di ponsel sungguhan.** Desain selalu menggambarnya, dan
+   di mockup desktop itu benar. Tapi di ponsel, OS sudah menggambar status bar
+   aslinya tepat di atas halaman — tiruannya jadi bar kedua yang bertumpuk,
+   menampilkan jam berbeda beberapa piksel dari jam asli. Disembunyikan lewat
+   `@media (pointer: coarse) and (max-width: 639px)` di `globals.css`.
+5. **Tiga layar Profil yang tidak ada di desain.** Baris "Kelas & wali kelas",
+   "Data diri" dan "Bantuan & masukan" sama-sama menampilkan tanda panah —
+   sinyal "ini pindah halaman" di seluruh aplikasi — tetapi tidak satu pun
+   punya tujuan. Yang pertama bahkan melompat ke tab Materi (`nav("subjects")`,
+   placeholder yang tidak pernah diselesaikan), dua sisanya hanya memunculkan
+   toast. Ketiganya sekarang punya layar sendiri, seluruhnya baca-saja dan
+   seluruhnya dari data seed yang sudah ada.
 
-Divergensi pertama satu-satunya yang terlihat di baseline visual, dan
-baseline-nya sudah diperbarui secara sengaja.
+Divergensi pertama satu-satunya yang mengubah baseline visual yang sudah ada,
+dan baseline-nya sudah diperbarui secara sengaja. Divergensi 4 tidak terlihat
+di harness sama sekali (harness berjalan dengan pointer halus, jadi media
+query-nya tidak pernah kena), dan divergensi 5 menambah tiga baseline baru
+tanpa menyentuh yang lama.
 
 ## Jam aplikasi
 
@@ -574,7 +599,7 @@ pertama, unggah satu berkas 5–10 MB sebagai guru dan pastikan tiga hal:
 
 ## Harness fidelitas
 
-Klaim "sama persis dengan desain" diverifikasi, bukan diasumsikan. 41 frame
+Klaim "sama persis dengan desain" diverifikasi, bukan diasumsikan. 44 frame
 dipotret pada 390×844 dan dibandingkan piksel-per-piksel dengan baseline yang
 ikut di-commit di `tests/__frames__/`, ditambah 100 uji tanpa peramban: label
 waktu, snapshot database, isolasi sandbox, pembersihan berkala, jalur tulis,

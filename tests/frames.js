@@ -25,6 +25,9 @@ export const FRAMES = [
   { id: "siswa-13-profile", url: q({ screen: "profile" }) },
   { id: "siswa-14-grades", url: q({ screen: "grades" }) },
   { id: "siswa-15-notifs", url: q({ screen: "notifs" }) },
+  { id: "siswa-16-kelas", url: q({ screen: "myClass" }) },
+  { id: "siswa-17-data-diri", url: q({ screen: "myData" }) },
+  { id: "siswa-18-bantuan", url: q({ screen: "help" }) },
 
   // ---- Guru ----
   { id: "guru-01-login", url: q({ screen: "login", role: "guru" }) },

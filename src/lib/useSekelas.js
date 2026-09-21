@@ -175,6 +175,9 @@ function initialState(props, snapshot) {
     // Berkas pilihan hidup di state klien saja — `File` tidak bisa diserialisasi.
     uploadFile: null,
     submitFile: null,
+    // Masukan bersifat demo — tidak ada backend untuknya, jadi isinya hidup di
+    // memori saja dan dikosongkan saat dikirim.
+    helpNote: "",
     loginEmail: "alya.p@nusantara1.sch.id",
     loginPass: "••••••••",
     toast: null,
@@ -752,6 +755,9 @@ export function useSekelas(props = {}, snapshot) {
       tuClassDetail: "tuClasses",
       submissions: "adminTasks",
       grades: "profile",
+      myClass: "profile",
+      myData: "profile",
+      help: "profile",
       notifs: "home",
     };
     const active = activeMap[st.screen] || st.screen;
@@ -806,6 +812,9 @@ export function useSekelas(props = {}, snapshot) {
       isTuTeachers: st.screen === "tuTeachers",
       isTuTeacherDetail: st.screen === "tuTeacherDetail",
       isGrades: st.screen === "grades",
+      isMyClass: st.screen === "myClass",
+      isMyData: st.screen === "myData",
+      isHelp: st.screen === "help",
       isNotifs: st.screen === "notifs",
       isSubmissions: st.screen === "submissions",
       isTuProfile: st.screen === "tuProfile",
@@ -958,10 +967,10 @@ export function useSekelas(props = {}, snapshot) {
         {
           label: "Kelas & wali kelas",
           value: cls(ME.classId).name + " · " + homeroomName(cls(ME.classId)),
-          open: () => nav("subjects"),
+          open: () => nav("myClass"),
         },
-        { label: "Data diri", value: "NISN " + ME.nisn, open: () => flash(ME.name + " · " + ME.birth) },
-        { label: "Bantuan & masukan", value: "", open: () => flash("Formulir bantuan dibuka.") },
+        { label: "Data diri", value: "NISN " + ME.nisn, open: () => nav("myData") },
+        { label: "Bantuan & masukan", value: "", open: () => nav("help") },
       ],
 
       adminActions: [
@@ -1067,6 +1076,73 @@ export function useSekelas(props = {}, snapshot) {
         mutate(patch, () => api.loginAction({ role: st.role, guruId: guru.id }));
       },
       toast: st.toast,
+
+      // ===== v2: Kelas & wali kelas, Data diri, Bantuan (siswa) =====
+      //
+      // `myClass` adalah kembaran baca-saja dari `tuClass`, dengan dua beda yang
+      // disengaja: kuncinya kelas Alya sendiri (`ME.classId`), bukan kelas yang
+      // sedang dipilih TU, dan tidak satu pun barisnya membawa aksi. Afordansi
+      // mutasi di layar TU dijaga server untuk peran `tu` (`persona.js`); di
+      // sini afordansinya memang tidak ada, jadi tidak ada yang perlu dijaga.
+      myClass: (() => {
+        const c = cls(ME.classId);
+        const t = homeroomOf(c);
+        const rn = c.roomName || "Ruang kelas";
+        const ri = roomInfo(rn);
+        return {
+          name: c.name,
+          level: "Tingkat " + c.level,
+          major: c.major,
+          tint: c.major === "IPA" ? "#F1EEFF" : c.major === "IPS" ? "#E9FBF3" : "#FFF7DB",
+          ink: c.major === "IPA" ? "#5334E0" : c.major === "IPS" ? "#0B7A55" : "#8A6100",
+          roomLabel: ri ? rn + " (" + ri.code + " · lantai " + ri.floor + ")" : rn,
+          homeroom: homeroomName(c),
+          homeroomInitials: t ? t.initials : "—",
+          homeroomEmail: t ? t.email : "—",
+          homeroomSubject: t
+            ? tSubjectIds(t)
+                .map((id) => subj(id).name)
+                .join(", ")
+            : "—",
+          // Jumlah siswa selalu dihitung, tidak pernah disimpan.
+          students: studentCount(c.id),
+          subjectCount: classSubjects(c.id).length,
+          teacherCount: st.teachers.filter((x) => tClassIds(x).indexOf(c.id) !== -1).length,
+        };
+      })(),
+
+      myData: {
+        className: cls(ME.classId).name,
+        rows: [
+          ["NIS", ME.nis],
+          ["NISN", ME.nisn],
+          ["Jenis kelamin", ME.gender],
+          ["Tempat & tanggal lahir", ME.birth],
+          ["Telepon", ME.phone],
+          ["Wali", ME.guardian],
+          ["Alamat", ME.address],
+        ],
+      },
+
+      help: {
+        school: SCHOOL.full,
+        rows: [
+          ["Alamat", SCHOOL.address],
+          ["Telepon", SCHOOL.phone],
+          ["NPSN", SCHOOL.npsn],
+          ["Kepala sekolah", SCHOOL.principal],
+          ["Tahun ajaran", SCHOOL.year + " · Semester " + SCHOOL.semester],
+        ],
+        note: st.helpNote,
+        canSend: st.helpNote.trim().length > 0,
+      },
+      setHelpNote: (e) => setState({ helpNote: e.target.value }),
+      // Tidak menyimpan ke mana pun: belum ada tabel maupun Server Action untuk
+      // masukan. Toast-nya jujur soal itu — ini formulir demo, bukan janji.
+      sendHelp: () => {
+        setState({ helpNote: "" });
+        flash("Masukan terkirim. Terima kasih!");
+      },
 
       // ===== v2: Nilai siswa =====
       goGrades: () => nav("grades"),

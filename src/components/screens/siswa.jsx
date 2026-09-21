@@ -1,6 +1,6 @@
 "use client";
 
-import { SkInput } from "@/components/ui-sekelas";
+import { SkInput, SkTextarea } from "@/components/ui-sekelas";
 import { cn } from "cn";
 
 /* ---------- small pieces the design repeats across screens ---------- */
@@ -824,6 +824,160 @@ export function GradesScreen({ v }) {
             </div>
           </div>
         ))}
+      </div>
+    </Screen>
+  );
+}
+
+/* ---------- v2 · Kelas & wali kelas ---------- */
+
+export function MyClassScreen({ v }) {
+  const c = v.myClass;
+  return (
+    <Screen className="bg-white pt-[56px] pb-[104px]">
+      <DetailHeader
+        onBack={v.goProfile}
+        label="Kelas & wali kelas"
+        size={44}
+        radius="rounded-[14px]"
+        labelClassName="text-ink-4"
+      />
+
+      <div className="mx-[22px] mt-[22px] flex items-start justify-between gap-[12px]">
+        <div className="min-w-0">
+          <div className="text-[26px] font-extrabold tracking-[-.9px]">{c.name}</div>
+          <div className="mt-[3px] text-[12.5px] font-semibold text-ink-5">
+            {c.level} · {c.roomLabel}
+          </div>
+        </div>
+        <span
+          className="flex-none rounded-[99px] px-[11px] py-[6px] text-[11px] font-bold whitespace-nowrap"
+          style={{ background: c.tint, color: c.ink }}
+        >
+          {c.major}
+        </span>
+      </div>
+
+      <div className="mx-[22px] mt-[18px] flex items-center gap-[13px] rounded-[22px] bg-app p-[16px]">
+        <div className="flex h-[46px] w-[46px] flex-none items-center justify-center rounded-[16px] bg-brand-tint text-[14.5px] font-extrabold text-brand-strong">
+          {c.homeroomInitials}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="text-[10.5px] font-extrabold tracking-[.4px] text-ink-5 uppercase">Wali kelas</div>
+          <div className="mt-[3px] text-[15px] font-extrabold tracking-[-.3px]">{c.homeroom}</div>
+          <div className="mt-[2px] truncate text-[11.5px] font-semibold text-ink-5">
+            Mengajar {c.homeroomSubject} · {c.homeroomEmail}
+          </div>
+        </div>
+      </div>
+
+      <div className="mx-[22px] mt-[12px] grid grid-cols-3 gap-[10px]">
+        {[
+          [c.students, "Siswa"],
+          [c.subjectCount, "Mapel"],
+          [c.teacherCount, "Guru"],
+        ].map(([value, label]) => (
+          <div key={label} className="rounded-[18px] bg-app p-[14px]">
+            <div className="text-[22px] font-extrabold tracking-[-.6px]">{value}</div>
+            <div className="mt-[2px] text-[11px] font-semibold text-ink-5">{label}</div>
+          </div>
+        ))}
+      </div>
+    </Screen>
+  );
+}
+
+/* ---------- v2 · Data diri ---------- */
+
+export function MyDataScreen({ v }) {
+  const d = v.myData;
+  return (
+    <Screen className="bg-white pt-[56px] pb-[104px]">
+      <DetailHeader
+        onBack={v.goProfile}
+        label="Data diri"
+        size={44}
+        radius="rounded-[14px]"
+        labelClassName="text-ink-4"
+      />
+
+      <div className="mx-[22px] mt-[22px] flex items-center gap-[13px]">
+        <div className="flex h-[54px] w-[54px] flex-none items-center justify-center rounded-[19px] bg-brand-tint text-[18px] font-extrabold text-brand">
+          {v.initials}
+        </div>
+        <div className="min-w-0">
+          <div className="text-[19px] font-extrabold tracking-[-.5px]">{v.studentName}</div>
+          <div className="mt-[2px] text-[12.5px] font-semibold text-ink-5">
+            {d.className} · {v.schoolName}
+          </div>
+        </div>
+      </div>
+
+      {/* Baris di sini tidak menuju ke mana pun, jadi sengaja tanpa tanda panah
+          dan tanpa gaya "bisa ditekan". */}
+      <div className="mx-[22px] mt-[18px] overflow-hidden rounded-[22px] border border-line-05">
+        {d.rows.map(([label, value]) => (
+          <div
+            key={label}
+            className="flex items-start justify-between gap-[14px] border-b border-line-05 p-[16px] last:border-b-0"
+          >
+            <div className="flex-none text-[12.5px] font-semibold text-ink-5">{label}</div>
+            <div className="min-w-0 text-right text-[13px] font-bold">{value}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="mx-[22px] mt-[14px] text-[11.5px] leading-[1.55] font-semibold text-ink-5">
+        Data ini dikelola tata usaha sekolah. Ada yang keliru? Sampaikan lewat Bantuan &amp; masukan.
+      </div>
+    </Screen>
+  );
+}
+
+/* ---------- v2 · Bantuan & masukan ---------- */
+
+export function HelpScreen({ v }) {
+  const h = v.help;
+  return (
+    <Screen className="bg-white pt-[56px] pb-[104px]">
+      <DetailHeader
+        onBack={v.goProfile}
+        label="Bantuan & masukan"
+        size={44}
+        radius="rounded-[14px]"
+        labelClassName="text-ink-4"
+      />
+
+      <div className="mx-[22px] mt-[22px]">
+        <div className="text-[24px] font-extrabold tracking-[-.8px]">Butuh bantuan?</div>
+        <div className="mt-[4px] text-[12.5px] leading-[1.5] font-semibold text-ink-5">
+          Hubungi tata usaha {h.school}, atau kirim masukan lewat formulir di bawah.
+        </div>
+      </div>
+
+      <div className="mx-[22px] mt-[16px] overflow-hidden rounded-[22px] border border-line-05">
+        {h.rows.map(([label, value]) => (
+          <div
+            key={label}
+            className="flex items-start justify-between gap-[14px] border-b border-line-05 p-[16px] last:border-b-0"
+          >
+            <div className="flex-none text-[12.5px] font-semibold text-ink-5">{label}</div>
+            <div className="min-w-0 text-right text-[13px] font-bold">{value}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="mx-[22px] mt-[20px]">
+        <div className="text-[13px] font-extrabold">Kirim masukan</div>
+        <SkTextarea rows={4} value={h.note} onChange={v.setHelpNote} placeholder="Tulis kendala atau saranmu di sini…" />
+        <button
+          type="button"
+          onClick={v.sendHelp}
+          disabled={!h.canSend}
+          className="mt-[10px] w-full cursor-pointer rounded-[18px] bg-brand p-[15px] text-[14px] font-bold text-white shadow-brand hover:bg-brand-strong disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
+        >
+          Kirim masukan
+        </button>
       </div>
     </Screen>
   );

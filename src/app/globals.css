@@ -168,3 +168,15 @@
 .sk-scroll::-webkit-scrollbar {
   display: none;
 }
+
+/* Ponsel sungguhan sudah menggambar status bar OS-nya tepat di atas halaman
+   ini, jadi tiruan kita jadi bar kedua yang bertumpuk — dan jam palsunya
+   berbeda dari jam asli beberapa piksel di atasnya. Sempit + pointer kasar =
+   ponsel. Harness fidelitas berjalan di Edge desktop (pointer halus) pada
+   390px, jadi `pointer: coarse` tidak pernah kena di sana dan 41 baseline
+   tetap memotret status bar persis seperti desainnya. */
+@media (pointer: coarse) and (max-width: 639px) {
+  .sk-status-bar {
+    display: none;
+  }
+}

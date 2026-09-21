@@ -18,10 +18,15 @@ export function PhoneFrame({ children, frameRef }) {
   );
 }
 
-/** Faux iOS status bar. Non-interactive, sits above every screen. */
+/**
+ * Faux iOS status bar. Non-interactive, sits above every screen.
+ *
+ * Disembunyikan di ponsel sungguhan lewat `.sk-status-bar` — di sana OS sudah
+ * menggambar status bar aslinya. Alasan lengkap ada di `globals.css`.
+ */
 export function StatusBar() {
   return (
-    <div className="pointer-events-none absolute inset-x-0 top-0 z-40 flex h-[52px] items-end justify-between px-[28px] pb-[8px] text-[12px] font-bold tracking-[.2px]">
+    <div className="sk-status-bar pointer-events-none absolute inset-x-0 top-0 z-40 flex h-[52px] items-end justify-between px-[28px] pb-[8px] text-[12px] font-bold tracking-[.2px]">
       <span>09:41</span>
       <span className="flex items-center gap-[4px]">
         <span className="h-[8px] w-[16px] rounded-[2px] bg-ink opacity-75" />
